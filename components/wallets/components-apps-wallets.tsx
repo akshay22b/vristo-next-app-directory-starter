@@ -110,6 +110,12 @@ const ComponentsAppsWallets = () => {
                 <div className="flex w-full flex-col gap-4 sm:w-auto sm:flex-row sm:items-center sm:gap-3">
                     <div className="flex gap-3">
                         <div>
+                            <button onClick={() => setAddWallet(true)} type="button" className="btn btn-primary">
+                                <IconPlus className="ltr:mr-2 rtl:ml-2" />
+                                Add Wallet
+                            </button>
+                        </div>
+                        <div>
                             <button type="button" className={`btn btn-outline-primary p-2 ${value === 'list' && 'bg-primary text-white'}`} onClick={() => setValue('list')}>
                                 <IconListCheck />
                             </button>
