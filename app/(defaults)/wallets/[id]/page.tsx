@@ -35,50 +35,39 @@ function WalletDetails() {
         getAllMnemonics(walletId);
     }, [walletId]);
 
-    for (const item of mnemonicsList) {
-        if (item.assetId === 'ETH') {
-            console.log('eth address', item.address);
-        }
-        if (item.assetId === 'USDC') {
-            console.log('eth address', item.address);
-        }
-        if (item.assetId === 'ETH') {
-            console.log('eth address', item.address);
-        }
-    }
-
-    // console.log('balance :', getETHBalance('0xCA78D52aC719Ce90610AF8845A282FE50F5840aC'));
-
     // ---------------------------------------------------
+    const getBalances = async (mnemonicsList: any[]) => {
+        const balancePromises = mnemonicsList.map(async (item: any) => {
+            let balance = 0;
+            if (item.assetId === 'ETH') {
+                const ethBalance = await getETHBalance(item.address);
+                balance = ethBalance.body.etherAmount;
+            } else if (item.assetId === 'USDC') {
+                const usdcBalance = await getUSDCBalance(item.address);
+                balance = usdcBalance.body.resultInEther;
+            } else if (item.assetId === 'USDT_ERC20') {
+                const usdtBalance = await getUSDTBalance(item.address);
+                balance = usdtBalance.body.resultInEther;
+            } else {
+                // console.log(`${item.assetId} Balance`, balance);
+            }
+            return { ...item, balance };
+        });
 
-    // const getAllBalance = async (mnemonicsList: Address[]) => {
-    //     try {
-    //         const balancePromises = mnemonicsList.map((address) => {
-    //             switch (address.assetId) {
-    //                 case 'ETH':
-    //                     return address.walletAddress;
-    //                 case 'USDC':
-    //                     return address.walletAddress;
-    //                 case 'USDT':
-    //                     return address.walletAddress;
-    //                 default:
-    //                     return Promise.resolve(null); // Handle unsupported assetId
-    //             }
-    //         });
+        const balances = await Promise.all(balancePromises);
+        return balances;
+    };
 
-    //         // const balances = await Promise.all(balancePromises);
+    useEffect(() => {
+        const fetchBalances = async () => {
+            const result = await getBalances(mnemonicsList);
+            setgetBalance(result);
+        };
 
-    //         // const validBalances = balances.filter((balance) => balance !== null);
+        fetchBalances();
+    }, [mnemonicsList]);
 
-    //         setgetBalance(balancePromises);
-    //     } catch (error) {
-    //         console.error('Error fetching balances:', error);
-    //     }
-    // };
-
-    // useEffect(() => {
-    //     getAllBalance(mnemonicsList);
-    // }, [mnemonicsList]);
+    console.log('getBalance', getBalance);
     // ---------------------------------------------------
 
     const maskAddress = (address: string): string => {
@@ -141,7 +130,7 @@ function WalletDetails() {
                             </tr>
                         </thead>
                         <tbody>
-                            {mnemonicsList.map((mnemonic: any) => {
+                            {getBalance.map((mnemonic: any) => {
                                 return (
                                     <tr key={mnemonic.id}>
                                         <td className="">{mnemonic.id}</td>
